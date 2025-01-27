@@ -3,6 +3,7 @@ using System.Linq;
 using BetterCommands.Management;
 using HarmonyLib;
 using helpers.Extensions;
+using helpers.Network.Requests;
 using PluginAPI.Events;
 using RemoteAdmin;
 using RemoteAdmin.Communication;
@@ -59,12 +60,18 @@ public static class ProcessQueryPatch
 			if (CommandManager.TryExecute(string.Join(" ", array2), ReferenceHub.HostHub, CommandType.RemoteAdmin, out __result))
 			{
 				__result = __result.RemoveHtmlTags();
-				sender.RaReply(__result, success: true, logToConsole: true, string.Empty);
-				return false;
+                if (!EventManager.ExecuteEvent(new RemoteAdminCommandExecutedEvent(sender, array2[0], array2.Skip(1).ToArray(), result: true, __result))) {
+                    return false;
+                }
+                sender.RaReply(__result, success: true, logToConsole: true, string.Empty);
+                return false;
 			}
 		}
 		else if (CommandManager.TryExecute(string.Join(" ", array2), playerCommandSender.ReferenceHub, CommandType.RemoteAdmin, out __result))
 		{
+            if (!EventManager.ExecuteEvent(new RemoteAdminCommandExecutedEvent(sender, array2[0], array2.Skip(1).ToArray(), result: true, __result))) {
+                return false;
+            }
 			sender.RaReply(__result, success: true, logToConsole: true, string.Empty);
 			return false;
 		}
